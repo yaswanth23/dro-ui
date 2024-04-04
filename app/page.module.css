@@ -131,3 +131,6 @@
   font-size: 0.9rem;
   font-family: "ClashGrotesk-Medium", sans-serif;
 }
+.map_container {
+  margin-top: 3rem;
+}

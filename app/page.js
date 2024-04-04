@@ -2,6 +2,12 @@
 
 import React, { useState } from "react";
 import axios from "axios";
+import {
+  GoogleMap,
+  LoadScript,
+  DirectionsRenderer,
+  Marker,
+} from "@react-google-maps/api";
 import styles from "./page.module.css";
 import Loader from "./components/loader/loader";
 
@@ -78,14 +84,192 @@ const LOCATIONS = [
   },
 ];
 
+const darkModeOptions = [
+  {
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#242f3e",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#746855",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#242f3e",
+      },
+    ],
+  },
+  {
+    featureType: "administrative.locality",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#263c3f",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#6b9a76",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#38414e",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry.stroke",
+    stylers: [
+      {
+        color: "#212a37",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#9ca5b3",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#746855",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [
+      {
+        color: "#1f2835",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#f3d19c",
+      },
+    ],
+  },
+  {
+    featureType: "transit",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#2f3948",
+      },
+    ],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#d59563",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#17263c",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#515c6d",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#17263c",
+      },
+    ],
+  },
+];
+
+const containerStyle = {
+  width: "600px",
+  height: "600px",
+  borderRadius: "0.3rem",
+};
+
+const center = {
+  lat: 12.9784,
+  lng: 77.6408,
+};
+
 const Home = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [routeData, setRouteData] = useState(null);
   const [totalDistanceKm, setTotalDistanceKm] = useState("0 km");
+  const [coordinates, setCoordinates] = useState([]);
+  const [mapResponse, setMapResponse] = useState(null);
 
   const handleChange = async (event) => {
     setRouteData(null);
+    setCoordinates([]);
+    setMapResponse(null);
+
     const selected = LOCATIONS.find(
       (location) => location.name === event.target.value
     );
@@ -107,10 +291,12 @@ const Home = () => {
     setRouteData(response.data.data);
     setIsLoading(false);
 
+    let coordinates = [];
     const totalDistanceKm = response.data.data.reduce((total, location) => {
       const distanceParts = location.shortestDistanceText.split(" ");
       const distance = parseFloat(distanceParts[0]);
       const unit = distanceParts[1];
+      coordinates.push(location.coordinates);
 
       let finalDistance = 0;
 
@@ -123,6 +309,37 @@ const Home = () => {
       return total + finalDistance;
     }, 0);
     setTotalDistanceKm(totalDistanceKm.toFixed(1) + " km");
+    setCoordinates(coordinates);
+
+    const directionsService = new window.google.maps.DirectionsService();
+
+    // Define waypoints excluding the first and last coordinates
+    const waypoints = coordinates.slice(1, -1).map((coord) => ({
+      location: new window.google.maps.LatLng(coord.lat, coord.lng),
+      stopover: true,
+    }));
+
+    directionsService.route(
+      {
+        origin: new window.google.maps.LatLng(
+          coordinates[0].lat,
+          coordinates[0].lng
+        ),
+        destination: new window.google.maps.LatLng(
+          coordinates[coordinates.length - 1].lat,
+          coordinates[coordinates.length - 1].lng
+        ),
+        waypoints: waypoints,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === window.google.maps.DirectionsStatus.OK) {
+          setMapResponse(result);
+        } else {
+          console.error(`Directions request failed due to ${status}`);
+        }
+      }
+    );
   };
 
   return (
@@ -192,6 +409,36 @@ const Home = () => {
             ))}
           </div>
         )}
+      </div>
+      <div className={styles.map_container}>
+        <LoadScript googleMapsApiKey="AIzaSyC2znSVKp2NenYkrawAuAUv8V379X_V9WI">
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={center}
+            zoom={12}
+            options={{
+              styles: darkModeOptions, // Apply dark mode styles
+            }}
+          >
+            {mapResponse && (
+              <>
+                <DirectionsRenderer
+                  options={{
+                    directions: mapResponse,
+                    suppressMarkers: true,
+                  }}
+                />
+                {coordinates.map((coord, index) => (
+                  <Marker
+                    key={index}
+                    position={{ lat: coord.lat, lng: coord.lng }}
+                    label={(index + 1).toString()}
+                  />
+                ))}
+              </>
+            )}
+          </GoogleMap>
+        </LoadScript>
       </div>
     </div>
   );
