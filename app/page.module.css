@@ -6,4 +6,56 @@
   word-spacing: 0.1rem;
   font-family: "ClashGrotesk-Regular", sans-serif;
   color: var(--white-color);
+  font-size: 1.8rem;
+}
+.main_container {
+  margin-top: 3rem;
+}
+.main_container h2 {
+  cursor: default;
+  word-spacing: 0.1rem;
+  color: var(--foreground-text-color);
+  font-size: 1.2rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  font-weight: 500;
+}
+.selector {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  border: none;
+  border: 2px solid var(--lightgrey-color);
+  cursor: pointer;
+  font-size: 1rem;
+  background-color: var(--lightwhite-color);
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  color: var(--secondary-color);
+}
+.selector:focus {
+  outline: none;
+}
+.selector:focus {
+  border: 2px solid var(--lightblue-color);
+}
+.selected_area {
+  margin-top: 0.5rem;
+  cursor: default;
+  word-spacing: 0.1rem;
+  color: var(--foreground-text-color);
+  font-size: 0.9rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+}
+.loading {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+}
+.loading p {
+  cursor: default;
+  word-spacing: 0.15rem;
+  color: var(--lightblue-color);
+  font-size: 0.9rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  margin-right: 1rem;
+  font-style: italic;
 }

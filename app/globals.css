@@ -9,6 +9,7 @@
   --secondary-color: #060606;
   --lightblack-color: #101213;
   --white-color: #ffffff;
+  --lightwhite-color: #f2f2f2;
   --lightgrey-color: #d3d3d3;
   --black-color: #000000;
   --red-color: #e63600;
@@ -23,6 +24,7 @@
   --violet-color: #b794f4;
   --lightviolet-color: #322659;
   --lightprimary-color: #0f3e25;
+  --lightblue-color: #2f80ed;
 }
 
 html {
