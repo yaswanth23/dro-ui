@@ -59,3 +59,75 @@
   margin-right: 1rem;
   font-style: italic;
 }
+.route_container {
+  margin-top: 3rem;
+}
+.route_container h2 {
+  cursor: default;
+  word-spacing: 0.1rem;
+  color: var(--foreground-text-color);
+  font-size: 1.2rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  font-weight: 500;
+}
+.route_main {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+  position: relative;
+}
+.circle {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--lightblue-color);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  color: var(--secondary-color);
+}
+.line {
+  position: absolute;
+  z-index: -1;
+  left: 1.2%;
+  width: 0.1rem;
+  height: 5rem;
+  top: 2.5rem;
+  background-color: var(--foreground-text-color);
+}
+.distance_main {
+  position: absolute;
+  z-index: -1;
+  left: 4%;
+  top: 4.2rem;
+}
+.distance_main p,
+.total_distance_value {
+  font-size: 0.8rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  color: var(--lightblue-color);
+}
+.route_data {
+  width: 22%;
+  margin-left: 1rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid rgba(138, 145, 158, 0.2);
+}
+.route_data p {
+  cursor: default;
+  word-spacing: 0.1rem;
+  color: var(--foreground-text-color);
+  font-size: 0.9rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+}
+.route_data span {
+  cursor: default;
+  word-spacing: 0.1rem;
+  color: var(--lightwhite-color);
+  font-size: 0.9rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+}

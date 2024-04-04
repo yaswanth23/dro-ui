@@ -82,8 +82,10 @@ const Home = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [routeData, setRouteData] = useState(null);
+  const [totalDistanceKm, setTotalDistanceKm] = useState("0 km");
 
   const handleChange = async (event) => {
+    setRouteData(null);
     const selected = LOCATIONS.find(
       (location) => location.name === event.target.value
     );
@@ -102,8 +104,25 @@ const Home = () => {
       data
     );
     console.log(response.data);
-    setRouteData(response.data);
+    setRouteData(response.data.data);
     setIsLoading(false);
+
+    const totalDistanceKm = response.data.data.reduce((total, location) => {
+      const distanceParts = location.shortestDistanceText.split(" ");
+      const distance = parseFloat(distanceParts[0]);
+      const unit = distanceParts[1];
+
+      let finalDistance = 0;
+
+      if (unit === "km") {
+        finalDistance = distance;
+      } else if (unit === "m") {
+        finalDistance = distance / 1000;
+      }
+
+      return total + finalDistance;
+    }, 0);
+    setTotalDistanceKm(totalDistanceKm.toFixed(1) + " km");
   };
 
   return (
@@ -137,6 +156,40 @@ const Home = () => {
           <div className={styles.loading}>
             <p>Calculating shortest route...</p>
             <Loader />
+          </div>
+        )}
+        {routeData && (
+          <div className={styles.route_container}>
+            <h2>
+              Shortest Path Found{" "}
+              <span className={styles.total_distance_value}>
+                {totalDistanceKm}
+              </span>
+            </h2>
+            {routeData.map((route, index) => (
+              <>
+                <div key={index} className={styles.route_main}>
+                  <div className={styles.circle}>{index + 1}</div>
+                  {index !== routeData.length - 1 && (
+                    <>
+                      <div className={styles.line}></div>
+                      <div className={styles.distance_main}>
+                        <p>{routeData[index + 1].shortestDistanceText}</p>
+                      </div>
+                    </>
+                  )}
+                  <div className={styles.route_data}>
+                    <p>
+                      Location: <span>{route.name}</span>
+                    </p>
+                    <p>
+                      Lat: <span>{route.coordinates.lat}</span>, Lng:{" "}
+                      <span>{route.coordinates.lng}</span>
+                    </p>
+                  </div>
+                </div>
+              </>
+            ))}
           </div>
         )}
       </div>
