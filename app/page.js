@@ -348,97 +348,104 @@ const Home = () => {
         <h2>Delivery route optimizer</h2>
       </div>
       <div className={styles.main_container}>
-        <h2>Select start location</h2>
-        <select
-          value={selectedLocation?.name}
-          onChange={handleChange}
-          className={styles.selector}
-        >
-          <option value="">Select location</option>
-          {LOCATIONS.map((location, index) => (
-            <option key={index} value={location.name}>
-              {location.name}
-            </option>
-          ))}
-        </select>
-        {selectedLocation && (
-          <div className={styles.selected_area}>
-            <p>
-              Lat: {selectedLocation.coordinates.lat}, Lng:{" "}
-              {selectedLocation.coordinates.lng}
-            </p>
-          </div>
-        )}
-        {isLoading && (
-          <div className={styles.loading}>
-            <p>Calculating shortest route...</p>
-            <Loader />
-          </div>
-        )}
-        {routeData && (
-          <div className={styles.route_container}>
-            <h2>
-              Shortest Path Found{" "}
-              <span className={styles.total_distance_value}>
-                {totalDistanceKm}
-              </span>
-            </h2>
-            {routeData.map((route, index) => (
-              <>
-                <div key={index} className={styles.route_main}>
-                  <div className={styles.circle}>{index + 1}</div>
-                  {index !== routeData.length - 1 && (
+        <div>
+          <h2>Select start location</h2>
+          <select
+            value={selectedLocation?.name}
+            onChange={handleChange}
+            className={styles.selector}
+          >
+            <option value="">Select location</option>
+            {LOCATIONS.map((location, index) => (
+              <option key={index} value={location.name}>
+                {location.name}
+              </option>
+            ))}
+          </select>
+          {selectedLocation && (
+            <div className={styles.selected_area}>
+              <p>
+                Lat: {selectedLocation.coordinates.lat}, Lng:{" "}
+                {selectedLocation.coordinates.lng}
+              </p>
+            </div>
+          )}
+          {isLoading && (
+            <div className={styles.loading}>
+              <p>Calculating shortest route...</p>
+              <Loader />
+            </div>
+          )}
+          {routeData && (
+            <div className={styles.route_container}>
+              <h2>
+                Shortest Path Found{" "}
+                <span className={styles.total_distance_value}>
+                  {totalDistanceKm}
+                </span>
+              </h2>
+              {routeData.map((route, index) => (
+                <>
+                  <div key={index} className={styles.route_main}>
+                    <div className={styles.circle}>{index + 1}</div>
+                    {/* {index !== routeData.length - 1 && (
                     <>
                       <div className={styles.line}></div>
                       <div className={styles.distance_main}>
                         <p>{routeData[index + 1].shortestDistanceText}</p>
                       </div>
                     </>
-                  )}
-                  <div className={styles.route_data}>
-                    <p>
-                      Location: <span>{route.name}</span>
-                    </p>
-                    <p>
-                      Lat: <span>{route.coordinates.lat}</span>, Lng:{" "}
-                      <span>{route.coordinates.lng}</span>
-                    </p>
+                  )} */}
+                    <div className={styles.route_data}>
+                      <p>
+                        Location: <span>{route.name}</span>
+                      </p>
+                      <div className={styles.distance_container}>
+                        <p>
+                          Lat: <span>{route.coordinates.lat}</span>, Lng:{" "}
+                          <span>{route.coordinates.lng}</span>
+                        </p>
+                        {index !== 0 && index !== routeData.length && (
+                          <p>{routeData[index].shortestDistanceText}</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className={styles.map_container}>
-        <LoadScript googleMapsApiKey="AIzaSyC2znSVKp2NenYkrawAuAUv8V379X_V9WI">
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={center}
-            zoom={12}
-            options={{
-              styles: darkModeOptions, // Apply dark mode styles
-            }}
-          >
-            {mapResponse && (
-              <>
-                <DirectionsRenderer
-                  options={{
-                    directions: mapResponse,
-                    suppressMarkers: true,
-                  }}
-                />
-                {coordinates.map((coord, index) => (
-                  <Marker
-                    key={index}
-                    position={{ lat: coord.lat, lng: coord.lng }}
-                    label={(index + 1).toString()}
+                </>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className={styles.map_container}>
+          <LoadScript googleMapsApiKey="AIzaSyC2znSVKp2NenYkrawAuAUv8V379X_V9WI">
+            <GoogleMap
+              mapContainerStyle={containerStyle}
+              center={center}
+              zoom={12}
+              options={{
+                styles: darkModeOptions,
+              }}
+            >
+              {mapResponse && (
+                <>
+                  <DirectionsRenderer
+                    options={{
+                      directions: mapResponse,
+                      suppressMarkers: true,
+                    }}
                   />
-                ))}
-              </>
-            )}
-          </GoogleMap>
-        </LoadScript>
+                  {coordinates.map((coord, index) => (
+                    <Marker
+                      key={index}
+                      position={{ lat: coord.lat, lng: coord.lng }}
+                      label={(index + 1).toString()}
+                    />
+                  ))}
+                </>
+              )}
+            </GoogleMap>
+          </LoadScript>
+        </div>
       </div>
     </div>
   );

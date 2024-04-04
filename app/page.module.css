@@ -10,6 +10,10 @@
 }
 .main_container {
   margin-top: 3rem;
+  /* adding new styles */
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 .main_container h2 {
   cursor: default;
@@ -74,11 +78,11 @@
   display: flex;
   align-items: center;
   margin-top: 1rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   position: relative;
 }
 .circle {
-  width: 2rem;
+  width: 2.2rem;
   height: 2rem;
   background-color: var(--lightblue-color);
   border-radius: 50%;
@@ -110,8 +114,18 @@
   font-family: "ClashGrotesk-Medium", sans-serif;
   color: var(--lightblue-color);
 }
+.distance_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.distance_container p:nth-child(2) {
+  font-size: 0.8rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  color: var(--lightblue-color);
+}
 .route_data {
-  width: 22%;
+  width: 100%;
   margin-left: 1rem;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -132,5 +146,5 @@
   font-family: "ClashGrotesk-Medium", sans-serif;
 }
 .map_container {
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
