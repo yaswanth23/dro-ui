@@ -23,6 +23,47 @@
   font-family: "ClashGrotesk-Medium", sans-serif;
   font-weight: 500;
 }
+.left_panel {
+  display: block;
+  width: 100%;
+}
+.textarea {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  border: none;
+  border: 2px solid var(--lightgrey-color);
+  font-size: 0.9rem;
+  background-color: var(--lightwhite-color);
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  color: var(--secondary-color);
+  width: 100%;
+  max-width: 25rem;
+  height: 10rem;
+}
+.calculate_button {
+  margin-top: 1.6rem;
+  padding: 1rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lightblue-color);
+  color: var(--white-color);
+  text-decoration: none;
+  border: none;
+  word-spacing: 0.1rem;
+}
+.error_message {
+  position: absolute;
+  font-size: 0.9rem;
+  font-family: "ClashGrotesk-Medium", sans-serif;
+  color: var(--red-color);
+}
 .selector {
   margin-top: 0.5rem;
   padding: 0.5rem;
@@ -80,6 +121,8 @@
   margin-top: 1rem;
   margin-bottom: 2rem;
   position: relative;
+  width: 100%;
+  max-width: 30rem;
 }
 .circle {
   width: 2.2rem;

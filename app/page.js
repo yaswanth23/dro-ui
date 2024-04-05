@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   GoogleMap,
@@ -10,79 +10,6 @@ import {
 } from "@react-google-maps/api";
 import styles from "./page.module.css";
 import Loader from "./components/loader/loader";
-
-const LOCATIONS = [
-  {
-    name: "MG Road, Bangalore",
-    coordinates: {
-      lat: 12.9758,
-      lng: 77.6045,
-    },
-  },
-  {
-    name: "Koramangala, Bangalore",
-    coordinates: {
-      lat: 12.9352,
-      lng: 77.6245,
-    },
-  },
-  {
-    name: "Indiranagar, Bangalore",
-    coordinates: {
-      lat: 12.9784,
-      lng: 77.6408,
-    },
-  },
-  {
-    name: "Whitefield, Bangalore",
-    coordinates: {
-      lat: 12.9698,
-      lng: 77.7499,
-    },
-  },
-  {
-    name: "Jayanagar, Bangalore",
-    coordinates: {
-      lat: 12.9308,
-      lng: 77.5838,
-    },
-  },
-  {
-    name: "Electronic City, Bangalore",
-    coordinates: {
-      lat: 12.8456,
-      lng: 77.6603,
-    },
-  },
-  {
-    name: "Yelahanka, Bangalore",
-    coordinates: {
-      lat: 13.1007,
-      lng: 77.5963,
-    },
-  },
-  {
-    name: "Malleshwaram, Bangalore",
-    coordinates: {
-      lat: 13.0068,
-      lng: 77.5692,
-    },
-  },
-  {
-    name: "Bannerghatta Road, Bangalore",
-    coordinates: {
-      lat: 12.8876,
-      lng: 77.597,
-    },
-  },
-  {
-    name: "Hebbal, Bangalore",
-    coordinates: {
-      lat: 13.0359,
-      lng: 77.597,
-    },
-  },
-];
 
 const darkModeOptions = [
   {
@@ -258,45 +185,68 @@ const center = {
 };
 
 const Home = () => {
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [jsonInput, setJsonInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [routeData, setRouteData] = useState(null);
   const [totalDistanceKm, setTotalDistanceKm] = useState("0 km");
   const [coordinates, setCoordinates] = useState([]);
   const [mapResponse, setMapResponse] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleChange = async (event) => {
+  useEffect(() => {
+    if (jsonInput == "") {
+      setErrorMessage("");
+    }
+  }, [jsonInput]);
+
+  const handleJsonChange = (event) => {
+    setJsonInput(event.target.value);
+  };
+
+  const handleCalculateRoute = async () => {
     setRouteData(null);
     setCoordinates([]);
     setMapResponse(null);
 
-    const selected = LOCATIONS.find(
-      (location) => location.name === event.target.value
-    );
-    setSelectedLocation(selected);
     setIsLoading(true);
 
-    let data = {
-      startLocation: {
-        lat: selected.coordinates.lat,
-        lng: selected.coordinates.lng,
-      },
-    };
+    try {
+      const parsedJson = JSON.parse(jsonInput);
 
+      if (
+        parsedJson &&
+        Array.isArray(parsedJson.coordinates) &&
+        parsedJson.coordinates.length >= 2
+      ) {
+        setErrorMessage("");
+        await calculateRoute(parsedJson);
+        setIsLoading(false);
+      } else {
+        setErrorMessage(
+          'Invalid JSON format: "coordinates" array must have at least two elements.'
+        );
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setErrorMessage("Invalid JSON format.");
+      setIsLoading(false);
+    }
+  };
+
+  const calculateRoute = async (request) => {
     const response = await axios.post(
       "https://611xkinx68.execute-api.ap-south-1.amazonaws.com/v1/calculate-route",
-      data
+      request
     );
-    console.log(response.data);
+
     setRouteData(response.data.data);
-    setIsLoading(false);
 
     let coordinates = [];
     const totalDistanceKm = response.data.data.reduce((total, location) => {
       const distanceParts = location.shortestDistanceText.split(" ");
       const distance = parseFloat(distanceParts[0]);
       const unit = distanceParts[1];
-      coordinates.push(location.coordinates);
+      coordinates.push({ lat: location.lat, lng: location.lng });
 
       let finalDistance = 0;
 
@@ -348,33 +298,28 @@ const Home = () => {
         <h2>Delivery route optimizer</h2>
       </div>
       <div className={styles.main_container}>
-        <div>
-          <h2>Select start location</h2>
-          <select
-            value={selectedLocation?.name}
-            onChange={handleChange}
-            className={styles.selector}
-          >
-            <option value="">Select location</option>
-            {LOCATIONS.map((location, index) => (
-              <option key={index} value={location.name}>
-                {location.name}
-              </option>
-            ))}
-          </select>
-          {selectedLocation && (
-            <div className={styles.selected_area}>
-              <p>
-                Lat: {selectedLocation.coordinates.lat}, Lng:{" "}
-                {selectedLocation.coordinates.lng}
-              </p>
-            </div>
-          )}
-          {isLoading && (
+        <div className={styles.left_panel}>
+          <h2>Enter Delivery coordinates</h2>
+          <textarea
+            value={jsonInput}
+            onChange={handleJsonChange}
+            className={styles.textarea}
+            placeholder="Enter JSON data here"
+          />
+          <br></br>
+          <span className={styles.error_message}>{errorMessage}</span>
+          {isLoading ? (
             <div className={styles.loading}>
               <p>Calculating shortest route...</p>
               <Loader />
             </div>
+          ) : (
+            <button
+              onClick={handleCalculateRoute}
+              className={styles.calculate_button}
+            >
+              Calculate Route
+            </button>
           )}
           {routeData && (
             <div className={styles.route_container}>
@@ -398,12 +343,12 @@ const Home = () => {
                   )} */}
                     <div className={styles.route_data}>
                       <p>
-                        Location: <span>{route.name}</span>
+                        Location: <span>{route.originAddress}</span>
                       </p>
                       <div className={styles.distance_container}>
                         <p>
-                          Lat: <span>{route.coordinates.lat}</span>, Lng:{" "}
-                          <span>{route.coordinates.lng}</span>
+                          Lat: <span>{route.lat}</span>, Lng:{" "}
+                          <span>{route.lng}</span>
                         </p>
                         {index !== 0 && index !== routeData.length && (
                           <p>{routeData[index].shortestDistanceText}</p>
