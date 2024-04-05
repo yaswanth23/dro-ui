@@ -8,6 +8,7 @@ import {
   DirectionsRenderer,
   Marker,
 } from "@react-google-maps/api";
+import { MdOutlineContentCopy } from "react-icons/md";
 import styles from "./page.module.css";
 import Loader from "./components/loader/loader";
 
@@ -292,6 +293,57 @@ const Home = () => {
     );
   };
 
+  const copySampleData = () => {
+    const sampleData = `{
+        "coordinates": [
+            {
+                "lat": 12.9784,
+                "lng": 77.6408
+            },
+            {
+                "lat": 12.9758,
+                "lng": 77.6045
+            },
+            {
+                "lat": 13.0068,
+                "lng": 77.5692
+            },
+            {
+                "lat": 13.0359,
+                "lng": 77.597
+            },
+            {
+                "lat": 13.1007,
+                "lng": 77.5963
+            },
+            {
+                "lat": 12.9308,
+                "lng": 77.5838
+            },
+            {
+                "lat": 12.9352,
+                "lng": 77.6245
+            },
+            {
+                "lat": 12.8876,
+                "lng": 77.597
+            },
+            {
+                "lat": 12.8456,
+                "lng": 77.6603
+            },
+            {
+                "lat": 12.9698,
+                "lng": 77.7499
+            }
+        ]
+    }`;
+    navigator.clipboard
+      .writeText(sampleData)
+      .then(() => alert("Sample data copied to clipboard"))
+      .catch((error) => console.error("Unable to copy sample data: ", error));
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -299,6 +351,15 @@ const Home = () => {
       </div>
       <div className={styles.main_container}>
         <div className={styles.left_panel}>
+          <div className={styles.instructions_main}>
+            <p>
+              Please enter the delivery coordinates in the following JSON
+              format:
+            </p>
+            <button onClick={copySampleData} className={styles.copy_button}>
+              <MdOutlineContentCopy /> Click to copy sample JSON data
+            </button>
+          </div>
           <h2>Enter Delivery coordinates</h2>
           <textarea
             value={jsonInput}
