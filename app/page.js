@@ -285,11 +285,10 @@ const Home = () => {
       "https://d401-119-82-80-154.ngrok-free.app/api/calculate-route",
       request
     );
-console.log("----",response)
-    setRouteData(response.data.data);
+    setRouteData(response.data);
 
     let coordinates = [];
-    const totalDistanceKm = response.data.data.reduce((total, location) => {
+    const totalDistanceKm = response.data.reduce((total, location) => {
       const distanceParts = location.shortestDistanceText.split(" ");
       const distance = parseFloat(distanceParts[0]);
       const unit = distanceParts[1];
