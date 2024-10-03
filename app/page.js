@@ -212,7 +212,14 @@ const Home = () => {
     setIsLoading(true);
 
     try {
-      const parsedJson = JSON.parse(jsonInput);
+      // let parsedJson = JSON.parse(jsonData);
+      let parsedJson = {
+        "coordinates": [
+          { "lat": 12.9784, "lng": 77.6408 },
+          { "lat": 12.9698, "lng": 77.7499 }
+        ]
+      }      
+      console.log("---> ", parsedJson)
 
       if (
         parsedJson &&
@@ -229,13 +236,16 @@ const Home = () => {
         setIsLoading(false);
       }
     } catch (error) {
+      console.log(error)
       setErrorMessage("Invalid JSON format.");
       setIsLoading(false);
     }
   };
 
   const calculateRouteCoordiantes = async (coordinates) => {
+    console.log("coordinates ---> ",coordinates);
     let startLocation = coordinates[0];
+    console.log("startLocation ---> ",startLocation);
     let unvisitedLocations = [...coordinates];
     let route = [];
     let addressesMap = new Map();
@@ -326,7 +336,7 @@ const Home = () => {
     //   request
     // );
 
-    let data = await calculateRouteCoordiantes(request);
+    let data = await calculateRouteCoordiantes(request.coordinates);
 
     setRouteData(data);
 
