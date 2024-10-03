@@ -234,13 +234,101 @@ const Home = () => {
     }
   };
 
-  const calculateRoute = async (request) => {
-    const response = await axios.post(
-      "https://611xkinx68.execute-api.ap-south-1.amazonaws.com/v1/calculate-route",
-      request
-    );
+  const calculateRouteCoordiantes = async (coordinates) => {
+    let startLocation = coordinates[0];
+    let unvisitedLocations = [...coordinates];
+    let route = [];
+    let addressesMap = new Map();
 
-    setRouteData(response.data.data);
+    while (unvisitedLocations.length > 0) {
+      let nearestLocation = null;
+      let shortestDistance = Infinity;
+      let shortestDistanceText = null;
+
+      for (const location of unvisitedLocations) {
+        const distanceData = await calculateDistance(
+          startLocation,
+          location,
+          addressesMap
+        );
+
+        const distanceInMeters = distanceData.distanceInMeters;
+        const distanceText = distanceData.distance;
+
+        if (distanceInMeters < shortestDistance) {
+          shortestDistance = distanceInMeters;
+          nearestLocation = location;
+          shortestDistanceText = distanceText;
+        }
+      }
+
+      if (nearestLocation) {
+        nearestLocation.originAddress = addressesMap.get(
+          `${nearestLocation.lat},${nearestLocation.lng}`
+        );
+        nearestLocation.shortestDistanceText = shortestDistanceText;
+        route.push(nearestLocation);
+        unvisitedLocations = unvisitedLocations.filter(
+          (loc) =>
+            loc.lat !== nearestLocation.lat || loc.lng !== nearestLocation.lng
+        );
+        startLocation = {
+          lat: nearestLocation.lat,
+          lng: nearestLocation.lng,
+        };
+      }
+      // else {
+      //   throw new Error("Failed to find the nearest location.");
+      // }
+    }
+
+    return route;
+  };
+
+  const calculateDistance = async (source, destination, addressesMap) => {
+    const apiKey = "AIzaSyAg1jbL4bRBmiqWx5ZQImooTyRSMQTOtcs";
+    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${source.lat},${source.lng}&destinations=${destination.lat},${destination.lng}&key=${apiKey}`;
+
+    const response = await axios.get(apiUrl);
+
+    if (response.data.status === "OK") {
+      const distance = response.data.rows[0]?.elements[0]?.distance?.text;
+      const duration = response.data.rows[0]?.elements[0]?.duration?.text;
+      const originAddresses = response.data.origin_addresses[0];
+      const destinationAddresses = response.data.destination_addresses[0];
+
+      const sourceKey = `${source.lat},${source.lng}`;
+      const destKey = `${destination.lat},${destination.lng}`;
+      if (!addressesMap.has(sourceKey)) {
+        addressesMap.set(sourceKey, originAddresses);
+      }
+      if (!addressesMap.has(destKey)) {
+        addressesMap.set(destKey, destinationAddresses);
+      }
+
+      const distanceInMeters =
+        response.data.rows[0]?.elements[0]?.distance?.value;
+
+      return {
+        distance,
+        distanceInMeters,
+        duration,
+        originAddresses,
+        destinationAddresses,
+      };
+    }
+  };
+
+  const calculateRoute = async (request) => {
+    // depricated api
+    // const response = await axios.post(
+    //   "https://611xkinx68.execute-api.ap-south-1.amazonaws.com/v1/calculate-route",
+    //   request
+    // );
+
+    let data = await calculateRouteCoordiantes(request);
+
+    setRouteData(data);
 
     let coordinates = [];
     const totalDistanceKm = response.data.data.reduce((total, location) => {
